@@ -57,26 +57,12 @@ pipeline {
     post {
 
         success {
-            emailext(
-                subject: "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: """
-                <h2>Build Successful</h2>
-
-                <b>Project:</b> ${APP_NAME}<br>
-                <b>Job:</b> ${env.JOB_NAME}<br>
-                <b>Build Number:</b> ${env.BUILD_NUMBER}<br>
-                <b>Status:</b> SUCCESS<br>
-                <b>Branch:</b> ${env.BRANCH_NAME}<br>
-                <b>Build URL:</b> ${env.BUILD_URL}<br>
-
-                <br>
-                The project was built successfully.
-                """,
-                mimeType: 'text/html',
-                to: "${EMAIL_TO}"
-            )
-        }
-
+           emailext(
+           to: 'aaronninan27@gmail.com',
+           subject: 'Test',
+           body: 'Hello'
+           )
+       }
         failure {
             emailext(
                 subject: "FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
