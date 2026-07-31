@@ -10,6 +10,11 @@ pipeline {
         skipDefaultCheckout(true)
     }
 
+    environment {
+        APP_NAME = "React Project"
+        EMAIL_TO = "your_email@example.com"
+    }
+
     stages {
 
         stage('Checkout') {
@@ -42,7 +47,7 @@ pipeline {
             }
         }
 
-        stage('Archive Build') {
+        stage('Archive Artifacts') {
             steps {
                 archiveArtifacts artifacts: 'my-react-app/dist/**', fingerprint: true
             }
@@ -50,6 +55,48 @@ pipeline {
     }
 
     post {
+
+        success {
+            emailext(
+                subject: "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
+                <h2>Build Successful</h2>
+
+                <b>Project:</b> ${APP_NAME}<br>
+                <b>Job:</b> ${env.JOB_NAME}<br>
+                <b>Build Number:</b> ${env.BUILD_NUMBER}<br>
+                <b>Status:</b> SUCCESS<br>
+                <b>Branch:</b> ${env.BRANCH_NAME}<br>
+                <b>Build URL:</b> ${env.BUILD_URL}<br>
+
+                <br>
+                The project was built successfully.
+                """,
+                mimeType: 'text/html',
+                to: "${EMAIL_TO}"
+            )
+        }
+
+        failure {
+            emailext(
+                subject: "FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
+                <h2>Build Failed</h2>
+
+                <b>Project:</b> ${APP_NAME}<br>
+                <b>Job:</b> ${env.JOB_NAME}<br>
+                <b>Build Number:</b> ${env.BUILD_NUMBER}<br>
+                <b>Status:</b> FAILED<br>
+                <b>Branch:</b> ${env.BRANCH_NAME}<br>
+                <b>Build URL:</b> ${env.BUILD_URL}<br>
+
+                Please check the Jenkins console log for the failure details.
+                """,
+                mimeType: 'text/html',
+                to: "${EMAIL_TO}"
+            )
+        }
+
         always {
             cleanWs()
         }
