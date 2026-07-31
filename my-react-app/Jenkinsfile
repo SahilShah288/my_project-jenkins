@@ -5,14 +5,14 @@ pipeline {
         nodejs 'NodeJS-20'
     }
 
-    options {
-        timestamps()
-        skipDefaultCheckout(true)
-    }
-
     environment {
         APP_NAME = "React Project"
         EMAIL_TO = "aaronninan27@gmail.com"
+    }
+
+    options {
+        timestamps()
+        skipDefaultCheckout(true)
     }
 
     stages {
@@ -57,29 +57,118 @@ pipeline {
     post {
 
         success {
-           emailext(
-           to: 'aaronninan27@gmail.com',
-           subject: 'Test',
-           body: 'Hello'
-           )
-       }
+            emailext(
+                to: "${EMAIL_TO}",
+                subject: "✅ SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                mimeType: 'text/html',
+                attachLog: true,
+                compressLog: true,
+                body: """
+                <html>
+                <body>
+
+                <h2 style="color:green;">Build Successful ✅</h2>
+
+                <table border="1" cellpadding="8" cellspacing="0">
+                    <tr>
+                        <th align="left">Project</th>
+                        <td>${APP_NAME}</td>
+                    </tr>
+                    <tr>
+                        <th align="left">Job Name</th>
+                        <td>${env.JOB_NAME}</td>
+                    </tr>
+                    <tr>
+                        <th align="left">Build Number</th>
+                        <td>${env.BUILD_NUMBER}</td>
+                    </tr>
+                    <tr>
+                        <th align="left">Status</th>
+                        <td><b style="color:green;">SUCCESS</b></td>
+                    </tr>
+                    <tr>
+                        <th align="left">Build URL</th>
+                        <td>
+                            <a href="${env.BUILD_URL}">
+                                ${env.BUILD_URL}
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+
+                <br>
+
+                <h3>Console Log</h3>
+
+                <pre>
+\${BUILD_LOG,maxLines=100}
+                </pre>
+
+                <br>
+
+                <b>The complete Jenkins console log is attached to this email.</b>
+
+                </body>
+                </html>
+                """
+            )
+        }
+
         failure {
             emailext(
-                subject: "FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: """
-                <h2>Build Failed</h2>
-
-                <b>Project:</b> ${APP_NAME}<br>
-                <b>Job:</b> ${env.JOB_NAME}<br>
-                <b>Build Number:</b> ${env.BUILD_NUMBER}<br>
-                <b>Status:</b> FAILED<br>
-                <b>Branch:</b> ${env.BRANCH_NAME}<br>
-                <b>Build URL:</b> ${env.BUILD_URL}<br>
-
-                Please check the Jenkins console log for the failure details.
-                """,
+                to: "${EMAIL_TO}",
+                subject: "❌ FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                 mimeType: 'text/html',
-                to: "${EMAIL_TO}"
+                attachLog: true,
+                compressLog: true,
+                body: """
+                <html>
+                <body>
+
+                <h2 style="color:red;">Build Failed ❌</h2>
+
+                <table border="1" cellpadding="8" cellspacing="0">
+                    <tr>
+                        <th align="left">Project</th>
+                        <td>${APP_NAME}</td>
+                    </tr>
+                    <tr>
+                        <th align="left">Job Name</th>
+                        <td>${env.JOB_NAME}</td>
+                    </tr>
+                    <tr>
+                        <th align="left">Build Number</th>
+                        <td>${env.BUILD_NUMBER}</td>
+                    </tr>
+                    <tr>
+                        <th align="left">Status</th>
+                        <td><b style="color:red;">FAILED</b></td>
+                    </tr>
+                    <tr>
+                        <th align="left">Build URL</th>
+                        <td>
+                            <a href="${env.BUILD_URL}">
+                                ${env.BUILD_URL}
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+
+                <br>
+
+                <h3>Last 100 Lines of Console Log</h3>
+
+                <pre>
+\${BUILD_LOG,maxLines=100}
+                </pre>
+
+                <br>
+
+                <b>The complete Jenkins console log is attached to this email.</b>
+
+                </body>
+                </html>
+                """
             )
         }
 
