@@ -12,7 +12,7 @@ pipeline {
 
     environment {
         APP_NAME = "React Project"
-        EMAIL_TO = "your_email@example.com"
+        EMAIL_TO = "aaronninan27@gmail.com"
     }
 
     stages {
