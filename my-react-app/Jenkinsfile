@@ -7,7 +7,7 @@ pipeline {
 
     environment {
         APP_NAME = "React Project"
-        EMAIL_TO = "aaronninan27@gmail.com"
+        EMAIL_TO = "sahil.cs@gmail.com"
     }
 
     options {
